@@ -9,11 +9,11 @@ rm(list = ls())
 setwd('C:/Users/ext-belche/rise-prelim-analysis')
 
 # loading data into R
-child_data_T0_ID <- read.csv(file='hhd_child_loop_T0.csv')
-child_data_T4_ID <- read.csv(file='hhd_child_loop_T4.csv')
-child_data_T6_ID <- read.csv(file='hhd_child_loop_T8.csv')
-child_data_T8_ID <- read.csv(file='hhd_child_loop_T8.csv')
-child_data_T10_ID <- read.csv(file='hhd_child_loop_T10.csv')
+child_data_T0_ID <- read.csv(file='ID_data/hhd_child_loop_T0.csv')
+child_data_T4_ID <- read.csv(file='ID_data/hhd_child_loop_T4.csv')
+child_data_T6_ID <- read.csv(file='ID_data/hhd_child_loop_T8.csv')
+child_data_T8_ID <- read.csv(file='ID_data/hhd_child_loop_T8.csv')
+child_data_T10_ID <- read.csv(file='ID_data/hhd_child_loop_T10.csv')
 
 T0_ID <- cbind(child_data_T0_ID)
 T4_ID <- cbind(child_data_T4_ID)
