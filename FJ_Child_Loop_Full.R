@@ -10,7 +10,7 @@ setwd('C:/Users/ext-belche/rise-prelim-analysis')
 # loading data into R 
 child_data_T0_FJ <- read.csv(file='FJ_data/hhd_child_loop_T0_FJ.csv')
 child_data_T2_FJ <- read.csv(file='FJ_data/hhd_child_loop_T2_FJ.csv')
-child_data_T4_FJ <- read.csv(file='FJ_data/hhd_child_loop_T6_FJ.csv')
+child_data_T4_FJ <- read.csv(file='FJ_data/hhd_child_symptoms_T4_FJ.csv')
 child_data_T6_FJ <- read.csv(file='FJ_data/hhd_child_loop_T6_FJ.csv')
 child_data_T8_FJ <- read.csv(file='FJ_data/hhd_child_loop_T8_FJ.csv')
 
@@ -44,7 +44,7 @@ num_rows <- nrow(T8_FJ)
 T8_FJ['Set'] <- rep('T8', num_rows)
 
 # set column 
-set <- c(T0_FJ$Set, T2_FJ$Set, T4_FJ$Set, T6_FJ$Set, T8_FJ$Set)
+set <- c(T0_FJ$Set, T2_FJ$Set, head(T4_FJ$Set, -1055), T6_FJ$Set, T8_FJ$Set)
 length(set)
 unique(set)
 
@@ -67,52 +67,52 @@ length(gen_health_overall)
 unique(gen_health_overall)
 
 injury <- c(T0_FJ$injury, T2_FJ$injury,
-            rep('Nonexistent', nrow(T4_FJ)), T6_FJ$injury, T8_FJ$injury)
+            head(T4_FJ$injury, -1055), T6_FJ$injury, T8_FJ$injury)
 length(injury)
 unique(injury)
 
 injury_types <- c(T0_FJ$injury_type, T2_FJ$injury_type,
-                  rep('Nonexistent', nrow(T4_FJ)), T6_FJ$injury_type, T8_FJ$injury_type)
+                  head(T4_FJ$injury_type, -1055), T6_FJ$injury_type, T8_FJ$injury_type)
 length(injury_types)
 unique(injury_types)
 
 medication_worms_yn <- c(rep('Nonexistent', nrow(T0_FJ)), T2_FJ$medication_worms_yn,
-                         rep('Nonexistent', nrow(T4_FJ)), T6_FJ$medication_worms_yn,
+                         head(rep('Nonexistent', nrow(T4_FJ)), -1055), T6_FJ$medication_worms_yn,
                          T8_FJ$medication_worms_yn)
 length(medication_worms_yn)
 unique(medication_worms_yn)
 
 doctor_yn <- c(T0_FJ$doctor_yn, T2_FJ$doctor_yn,
-               rep('Nonexistent', nrow(T4_FJ)), T6_FJ$doctor_yn,
+               head(T4_FJ$doctor_yn, -1055), T6_FJ$doctor_yn,
                T8_FJ$doctor_yn)
 length(doctor_yn)
 unique(doctor_yn)
 
 doctor_antibiotics <- c(T0_FJ$doctor_antibiotics, T2_FJ$doctor_antibiotics,
-                        rep('Nonexistent', nrow(T4_FJ)), T6_FJ$doctor_antibiotics,
+                        head(T4_FJ$doctor_antibiotics, -1055), T6_FJ$doctor_antibiotics,
                         T8_FJ$doctor_antibiotics)
 length(doctor_antibiotics)
 unique(doctor_antibiotics)
 
 hospital_yn <- c(T0_FJ$hospital_yn, T2_FJ$hospital_yn,
-                 rep('Nonexistent', nrow(T4_FJ)), T6_FJ$hospital_yn, T8_FJ$hospital_yn)
+                 head(T4_FJ$hospital_yn, -1055), T6_FJ$hospital_yn, T8_FJ$hospital_yn)
 length(hospital_yn)
 unique(hospital_yn)
 
 hospital_antibiotics <- c(T0_FJ$hospital_antibiotics, T2_FJ$hospital_antibiotics,
-                          rep('Nonexistent', nrow(T4_FJ)), T6_FJ$hospital_antibiotics,
+                          head(T4_FJ$hospital_antibiotics, -1055), T6_FJ$hospital_antibiotics,
                           T8_FJ$hospital_antibiotics)
 length(hospital_antibiotics)
 unique(hospital_antibiotics)
 
 
 breastfed_3m_yn <- c(rep('Nonexistent', nrow(T0_FJ)), rep('Nonexistent', nrow(T2_FJ)),
-                     rep('Nonexistent', nrow(T4_FJ)), T6_FJ$breastfed_3m_yn, T8_FJ$breastfed_3m_yn)
+                     head(rep('Nonexistent', nrow(T4_FJ)), -1055), T6_FJ$breastfed_3m_yn, T8_FJ$breastfed_3m_yn)
 length(breastfed_3m_yn)
 unique(breastfed_3m_yn)
 
 vaccinations_yn <- c(rep('Nonexistent', nrow(T0_FJ)), T2_FJ$vaccinations_yn,
-                     rep('Nonexistent', nrow(T4_FJ)), rep('Nonexistent', nrow(T6_FJ)),
+                     head(rep('Nonexistent', nrow(T4_FJ)), -1055), rep('Nonexistent', nrow(T6_FJ)),
                      T8_FJ$vaccinations_yn_a)
 
 length(vaccinations_yn)
@@ -445,7 +445,7 @@ group_doc_visit[is.na(group_doc_visit)] <- -1
 bt= -1:15
 doctor_visit <- ggplot(group_doc_visit, aes(x=doc_visit_score, fill=set, y=prop*100)) + 
   geom_bar(position='dodge', stat='identity') + theme(axis.text.x = element_text(angle = 90, vjust = 1)) +
-  scale_x_continuous("Number of Doctor Visits", labels = as.character(bt), breaks = bt) + ylim(0.0, 100) +
+  scale_x_continuous("Number of Doctor Visits", labels = as.character(bt), breaks = bt) + xlim(0.0, 15.0) + ylim(0.0, 100) +
   ggtitle("Doctor Visit") + labs(y='% Respondents', x='Number of Doctor Visits')
 doctor_visit
 

@@ -3,6 +3,7 @@ library(dplyr)
 library(tidyr)
 library(tibble)
 library(data.table)
+library(tidyverse)
 
 
 rm(list = ls())
@@ -11,7 +12,7 @@ setwd('C:/Users/ext-belche/rise-prelim-analysis')
 # loading data into R
 child_data_T0_ID <- read.csv(file='ID_data/hhd_child_loop_T0.csv')
 child_data_T4_ID <- read.csv(file='ID_data/hhd_child_loop_T4.csv')
-child_data_T6_ID <- read.csv(file='ID_data/hhd_child_loop_T8.csv')
+child_data_T6_ID <- read.csv(file='ID_data/hhd_child_symptoms_T6.csv')
 child_data_T8_ID <- read.csv(file='ID_data/hhd_child_loop_T8.csv')
 child_data_T10_ID <- read.csv(file='ID_data/hhd_child_loop_T10.csv')
 
@@ -43,7 +44,7 @@ T10_ID['Set'] <- rep('T10', num_rows)
 
 
 # set column 
-set <- c(T0_ID$Set, T4_ID$Set, T6_ID$Set, T8_ID$Set, T10_ID$Set)
+set <- c(T0_ID$Set, T4_ID$Set, head(T6_ID$Set, -1332), T8_ID$Set, T10_ID$Set)
 length(set)
 unique(set)
 
@@ -67,41 +68,41 @@ length(gen_health_overall)
 unique(gen_health_overall)
 
 injury <- c(T0_ID$injury, T4_ID$injury,
-            rep('Nonexistent', nrow(T6_ID)), T8_ID$injury, T10_ID$injury)
+            head(T6_ID$injury, -1332), T8_ID$injury, T10_ID$injury)
 length(injury)
 unique(injury)
 
 injury_types <- c(T0_ID$injury_type, T4_ID$injury_type,
-                  rep('Nonexistent', nrow(T6_ID)), T8_ID$injury_type, T10_ID$injury_type)
+                  T6_ID$injury_type, T8_ID$injury_type, T10_ID$injury_type)
 length(injury_types)
 unique(injury_types)
 
 medication_worms_yn <- c(rep('Nonexistent', nrow(T0_ID)), T4_ID$medication_worms_yn,
-                         rep('Nonexistent', nrow(T6_ID)), T8_ID$medication_worms_yn,
+                         head(rep('Nonexistent', nrow(T6_ID)), -1332), T8_ID$medication_worms_yn,
                          T10_ID$medication_worms_yn)
 length(medication_worms_yn)
 unique(medication_worms_yn)
 
 doctor_yn <- c(T0_ID$doctor_yn, T4_ID$doctor_yn,
-               rep('Nonexistent', nrow(T6_ID)), T8_ID$doctor_yn,
+               head(T6_ID$doctor_yn, -1332), T8_ID$doctor_yn,
                T10_ID$doctor_yn)
 length(doctor_yn)
 unique(doctor_yn)
 
 doctor_antibiotics <- c(T0_ID$doctor_antibiotics, T4_ID$doctor_antibiotics,
-                        rep('Nonexistent', nrow(T6_ID)), T8_ID$doctor_antibiotics,
+                        T6_ID$doctor_antibiotics, T8_ID$doctor_antibiotics,
                         T10_ID$doctor_antibiotics)
 length(doctor_antibiotics)
 unique(doctor_antibiotics)
 
 hospital_yn <- c(T0_ID$hospital_yn, T4_ID$hospital_yn,
-                 rep('Nonexistent', nrow(T6_ID)), T8_ID$hospital_yn,
+                 head(rep('Nonexistent', nrow(T6_ID)), -1332), T8_ID$hospital_yn,
                  T10_ID$hospital_yn)
 length(hospital_yn)
 unique(hospital_yn)
 
 hospital_antibiotics <- c(T0_ID$hospital_antibiotics, T4_ID$hospital_antibiotics,
-                          rep('Nonexistent', nrow(T6_ID)), T8_ID$hospital_antibiotics,
+                          head(rep('Nonexistent', nrow(T6_ID)), -1332), T8_ID$hospital_antibiotics,
                           T10_ID$hospital_antibiotics)
 length(hospital_antibiotics)
 unique(hospital_antibiotics)
@@ -112,7 +113,7 @@ unique(hospital_antibiotics)
 #unique(water_yn)
 
 vaccinations_yn <- c(rep('Nonexistent', nrow(T0_ID)), T4_ID$vaccinations_yn,
-                     rep('Nonexistent', nrow(T6_ID)), T8_ID$vaccinations_yn,
+                     head(rep('Nonexistent', nrow(T6_ID)), -1332), T8_ID$vaccinations_yn,
                      T10_ID$vaccinations_yn_a)
 
 length(vaccinations_yn)
@@ -120,7 +121,7 @@ unique(vaccinations_yn)
 
 
 breastfed_3m_yn <- c(rep('Nonexistent', nrow(T0_ID)), rep("Nonexistent", nrow(T4_ID)), 
-                     rep('Nonexistent', nrow(T6_ID)), T8_ID$breastfed_3m_yn,
+                     head(rep('Nonexistent', nrow(T6_ID)), -1332), T8_ID$breastfed_3m_yn,
                      T10_ID$breastfed_3m_yn)
 length(breastfed_3m_yn)
 unique(breastfed_3m_yn)
@@ -164,10 +165,10 @@ names(add) <- c('set', 'gen_health_score', 'prop')
 group_gen_health <- rbind(group_gen_health, add)
 group_gen_health 
 # plotting 
-general_health <- ggplot(group_gen_health, aes(x=gen_health_score, fill=set, y=prop*100)) + 
+general_health <- ggplot(group_gen_health, aes(x=gen_health_score, fill=factor(set, levels=c('T0', 'T4', 'T6', 'T8', 'T10')), y=prop*100)) + 
   geom_bar(position='dodge', stat='identity') + 
   xlim(1, 5.5) + ylim(0.0, 100)+
-  ggtitle("General Child Health") + labs(y='% Respondents', x='General Child Health Scores')
+  ggtitle("General Child Health") + labs(y='% Respondents', x='General Child Health Scores', fill = 'Set')
 general_health
 
 # INJURY
@@ -189,10 +190,10 @@ group_injury$prop[group_injury$set == 'T8'] <- group_injury$prop[group_injury$se
 group_injury$prop[group_injury$set == 'T10'] <- group_injury$prop[group_injury$set == 'T10']/t10id_size
 group_injury
 
-#injury plot
-injury_plot  <- ggplot(group_injury, aes(x=injury_yn, fill=set, y=prop*100)) + 
+#injury plotting
+injury_plot  <- ggplot(group_injury, aes(x=injury_yn, fill=factor(set, levels=c('T0', 'T4', 'T6', 'T8', 'T10')), y=prop*100)) + 
   geom_bar(position='dodge', stat='identity') + 
-  ggtitle("Injuries") + labs(y='% Respondents', x='Yes/No Injuries Reported')
+  ggtitle("Injuries") + labs(y='% Respondents', x='Yes/No Injuries Reported', fill = "Set")
 injury_plot
 
 # INJURY TYPES ANALYSIS 
@@ -261,9 +262,9 @@ group_vax$prop[group_vax$set == 'T10'] <- group_vax$prop[group_vax$set == 'T10']
 
 group_vax
 # plotting 
-vax <- ggplot(group_vax, aes(x=vax_yn, fill=set, y=prop*100)) + 
+vax <- ggplot(group_vax, aes(x=vax_yn, fill=factor(set, levels=c('T0', 'T4', 'T6', 'T8', 'T10')), y=prop*100)) + 
   geom_bar(position='dodge', stat='identity') + 
-  ggtitle("Vaccinations") + labs(y='% Respondents', x='Yes/No Received Vaccines')
+  ggtitle("Vaccinations") + labs(y='% Respondents', x='Yes/No Received Vaccines', fill = 'Set')
 vax
 
 
@@ -312,9 +313,9 @@ group_hospital_yn$prop[group_hospital_yn$set == 'T8'] <- group_hospital_yn$prop[
 group_hospital_yn$prop[group_hospital_yn$set == 'T10'] <- group_hospital_yn$prop[group_hospital_yn$set == 'T10']/t10id_size * 100
 
 # plotting 
-hospital_yn_id_plot <- ggplot(group_hospital_yn, aes(x=intermediate_hospital_yn, fill=set, y=prop)) + 
+hospital_yn_id_plot <- ggplot(group_hospital_yn, aes(x=intermediate_hospital_yn, fill=factor(set, levels=c('T0', 'T4', 'T6', 'T8', 'T10')), y=prop)) + 
   geom_bar(position='dodge', stat='identity') + 
-  ggtitle("Hospital Visits (Indonesia)") + labs(y='Percentage (%)', x='Hospital Visits')
+  ggtitle("Hospital Visits (Indonesia)") + labs(y='Percentage (%)', x='Hospital Visits', fill = "Set")
 hospital_yn_id_plot
 
 # yes_doctor_anti_T4_ID <- T4_ID %>% filter(doctor_yn >0) %>% select(doctor_antibiotics)
@@ -368,15 +369,15 @@ add_hospital_anti_dk
 group_hospital_anti <- rbind(group_hospital_anti, add_hospital_anti_dk)
 group_hospital_anti
 
-#hospital antibiotics plot
-hospital_antibiotics_plot  <- ggplot(group_hospital_anti, aes(x=intermediate_hospital_anti, fill=set, y=prop)) + 
+#hospital antibiotics plotting
+hospital_antibiotics_plot  <- ggplot(group_hospital_anti, aes(x=intermediate_hospital_anti, fill=factor(set, levels=c('T0', 'T4', 'T6', 'T8', 'T10')), y=prop)) + 
   geom_bar(position='dodge', stat='identity') + 
-  ggtitle("Hospital Antibiotics") + labs(y='Percentage (%)', x='Yes/No Hospital Antibiotics') + 
+  ggtitle("Hospital Antibiotics") + labs(y='Percentage (%)', x='Yes/No Hospital Antibiotics', fill = "Set") + 
   ylim(0, 60)
 hospital_antibiotics_plot
 
 
-# WATER ANALYSIS 
+D# WATER ANALYSIS 
 #handling water
 #water <- combo %>% select(water_yn, set)
 #unique(water)
@@ -437,10 +438,9 @@ group_doctor_visit$doc_visit_score
 group_doctor_visit[is.na(group_doctor_visit)] <- -1
 # plotting 
 bt= 0:12
-doc_vis <- ggplot(group_doctor_visit, aes(x=doc_visit_score, y=prop*100, fill=set)) + 
-  geom_bar(position='dodge', stat='identity') + theme(axis.text.x = element_text(angle = 90, vjust = 1)) + ylim(0.0, 100) +
-  scale_x_continuous("Number of Doctor Visits", labels = as.character(bt), breaks = bt) + 
-  ggtitle("Doctor Visits") + labs(y='% of Respondents', x='Number of Doctor Visits')
+doc_vis <- ggplot(group_doctor_visit, aes(x=doc_visit_score, y=prop*100, fill=factor(set, levels=c('T0', 'T4', 'T6', 'T8', 'T10')))) + 
+  geom_bar(position='dodge', stat='identity') + theme(axis.text.x = element_text(angle = 90, vjust = 1)) + xlim(0.0, 15.0) + ylim(0.0, 100) +
+  ggtitle("Doctor Visits") + labs(y='% of Respondents', x='Number of Doctor Visits', fill = 'Set')
 doc_vis
 
 
@@ -470,9 +470,9 @@ group_doctor_antibio$prop[group_doctor_antibio$set == 'T10'] <- group_doctor_ant
 group_doctor_antibio
 t0id_size
 # plotting 
-doc_anti <- ggplot(group_doctor_antibio, aes(x=doc_antibio_score, fill=set, y=prop*100)) + 
+doc_anti <- ggplot(group_doctor_antibio, aes(x=doc_antibio_score, fill=factor(set, levels=c('T0', 'T4', 'T6', 'T8', 'T10')), y=prop*100)) + 
   geom_bar(position='dodge', stat='identity') + ylim(0.0, 30) +
-  ggtitle("Antiobiotics Given During Doctor Visits") + labs(y='% Respondents', x='Recieved Antibiotics')
+  ggtitle("Antiobiotics Given During Doctor Visits") + labs(y='% Respondents', x='Recieved Antibiotics', fill = "Set")
 doc_anti
 
 
@@ -500,9 +500,9 @@ group_med_worms$prop[group_med_worms$set == 'T10'] <- group_med_worms$prop[group
 group_med_worms
 
 # plotting 
-worms_med <- ggplot(group_med_worms, aes(x=med_worms_score, fill=set, y=prop*100)) + 
+worms_med <- ggplot(group_med_worms, aes(x=med_worms_score, fill=factor(set, levels=c('T0', 'T4', 'T6', 'T8', 'T10')), y=prop*100)) + 
   geom_bar(position='dodge', stat='identity') + ylim(0.0, 30) +
-  ggtitle("Given Deworming Treatment") + labs(y='% Respondents', x='Recieved Treatment')
+  ggtitle("Given Deworming Treatment") + labs(y='% Respondents', x='Recieved Treatment', fill = 'Set')
 worms_med
 
 #breastfeed
@@ -532,9 +532,8 @@ group_breastfed_3$prop[group_breastfed_3$set == 'T8'] <- group_breastfed_3$prop[
 group_breastfed_3$prop[group_breastfed_3$set == 'T10'] <- group_breastfed_3$prop[group_breastfed_3$set == 'T10']/t10id_size
 group_breastfed_3
 # plotting 
-
-breastfed_3m <- ggplot(group_breastfed_3, aes(x=breastfed_3_score, y=prop*100, fill=set)) + 
+breastfed_3m <- ggplot(group_breastfed_3, aes(x=breastfed_3_score, y=prop*100, fill=factor(set, levels=c('T0', 'T4', 'T6', 'T8', 'T10')))) + 
   geom_bar(position='dodge', stat='identity') + ylim(0.0, 30) +
-  ggtitle("Consumption of Breast Milk") + labs(y='% of Respondents', x='Drank Breast Milk (within 3 months)')
+  ggtitle("Consumption of Breast Milk") + labs(y='% of Respondents', x='Drank Breast Milk (within 3 months)', fill = 'Set')
 breastfed_3m
 
